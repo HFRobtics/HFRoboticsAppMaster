@@ -43,10 +43,10 @@ public class HardwareHFbot
         hwMap = ahwMap;
 
         // Define and Initialize Motors
-        frontleftMotor   = hwMap.dcMotor.get("front_left_drive");
-        frontrightMotor  = hwMap.dcMotor.get("front_right_drive");
-        backleftMotor   = hwMap.dcMotor.get("back_left_drive");
-        backrightMotor  = hwMap.dcMotor.get("back_right_drive");
+        frontleftMotor   = hwMap.dcMotor.get("fl");
+        frontrightMotor  = hwMap.dcMotor.get("fr");
+        backleftMotor   = hwMap.dcMotor.get("bl");
+        backrightMotor  = hwMap.dcMotor.get("br");
 
         frontleftMotor.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
         frontrightMotor.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
@@ -98,8 +98,9 @@ public class HardwareHFbot
         period.reset();
     }
     public void drive(double fl, double fr, double bl, double br ){
-        frontrightMotor.setPower(fr);
-        frontleftMotor.setPower(fl);
+        double slowRatio = (3.0/4);
+        frontrightMotor.setPower(fr*slowRatio);
+        frontleftMotor.setPower(fl*slowRatio);
         backrightMotor.setPower(br);
         backleftMotor.setPower(bl);
     }
