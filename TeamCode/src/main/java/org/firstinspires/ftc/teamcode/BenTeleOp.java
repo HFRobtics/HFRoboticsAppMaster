@@ -32,8 +32,14 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.firstinspires.ftc.teamcode;
 
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.net.Uri;
+
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
+
 
 /**
  * This file provides basic Telop driving for a Pushbot robot.
@@ -56,7 +62,6 @@ public class BenTeleOp extends OpMode {
 
     /* Declare OpMode members.s */
     HardwareHFbot robot       = new HardwareHFbot(); // use the class created to define a Pushbot's hardware
-
     /*
      * Code to run ONCE when the driver hits INIT
      */
@@ -94,16 +99,47 @@ public class BenTeleOp extends OpMode {
         double rightStickY = -gamepad1.right_stick_y;
         double linearPower = rightStickY;
         double rotationalPower = rightStickY - rightStickX;
+        double leftTrigger = gamepad1.left_trigger;
+        double rightTrigger = gamepad1.right_trigger;
+        int quadrant = getQuadrant(rightStickX,rightStickY);
 
-        if (rightStickY >= 0){
-            if (rightStickX >=0) {
-                //robot.drive(linearPower, rotationalPower, rotationalPower, linearPower);
+        switch (quadrant){
+            case 0:
+                robot.drive(0,0,0,0);
+            case 1 :
+                robot.drive(linearPower, rotationalPower, rotationalPower, linearPower); //Sets FR && BL to Rotational in Quadrant 1
+                break;
+            case 2:
+                robot.drive(rotationalPower,linearPower,linearPower,rotationalPower); //Sets FL && BR to Rotational in Quadrant 2
+                break;
+            case 3 :
+                robot.drive(linearPower, rotationalPower, rotationalPower, linearPower); //Sets FR && BL to Rotational in Quadrant 3
+                break;
+            case 4:
+                robot.drive(rotationalPower,linearPower,linearPower,rotationalPower); //Sets FL && BR to Rotational in Quadrant 4
+                break;
+            case 5:
+                robot.drive(rightStickX,-rightStickX,-rightStickX,rightStickX); //Sets motors FL && BR to opposite X-vaule of FR && BL
+                break;
+
+        }
+
+        while((leftTrigger > 0 || rightTrigger > 0) && !(leftTrigger > 0 && rightTrigger > 0)){ //Checks is one trigger is down but not both
+            if(leftTrigger > 0){
+                robot.drive(0,leftTrigger,leftTrigger,0); //Sets FR && BL to leftTrigger vaule and will rotate robot left
+            }
+            if (rightTrigger > 0){
+                robot.drive(rightTrigger,0,0,rightTrigger); //Sets FL && BR to rightTrigger vaule and will rotate robot right
             }
         }
+
+
+
         telemetry.addData("Joy Y", rightStickY);
         telemetry.addData("Joy X", rightStickX);
         telemetry.addData("FLBR", linearPower);
         telemetry.addData("FRBL", rotationalPower);
+        telemetry.addData("Quadrant", quadrant);
 
 
 
@@ -123,6 +159,16 @@ public class BenTeleOp extends OpMode {
      */
     @Override
     public void stop() {
+    }
+
+    public int getQuadrant(double xJoyPos, double yJoyPos){ //Returns Quadrant of joystick
+        if (yJoyPos == 0 && xJoyPos == 0) return 0;
+        if (yJoyPos > 0 && xJoyPos > 0) return 1;
+        if (yJoyPos < 0 && xJoyPos > 0) return 2;
+        if (yJoyPos < 0 && xJoyPos < 0) return 3;
+        if (yJoyPos > 0 && xJoyPos < 0) return 4;
+        if (yJoyPos == 0 && (xJoyPos == 1 || xJoyPos == -1)) return 5;
+        return 1;
     }
 
 }
