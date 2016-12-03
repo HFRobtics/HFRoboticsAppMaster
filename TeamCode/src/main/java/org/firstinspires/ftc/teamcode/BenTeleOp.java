@@ -68,7 +68,7 @@ public class BenTeleOp extends OpMode {
         robot.init(hardwareMap);
 
         // Send telemetry message to signify robot waiting;
-        telemetry.addData("Say", "Hello Driver");    //
+        telemetry.addData("Say", "Hello Driver");
     }
 
     /*
@@ -90,6 +90,23 @@ public class BenTeleOp extends OpMode {
      */
     @Override
     public void loop() {
+        double rightStickX = gamepad1.right_stick_x;
+        double rightStickY = -gamepad1.right_stick_y;
+        double linearPower = rightStickY;
+        double rotationalPower = rightStickY - rightStickX;
+
+        if (rightStickY >= 0){
+            if (rightStickX >=0) {
+                //robot.drive(linearPower, rotationalPower, rotationalPower, linearPower);
+            }
+        }
+        telemetry.addData("Joy Y", rightStickY);
+        telemetry.addData("Joy X", rightStickX);
+        telemetry.addData("FLBR", linearPower);
+        telemetry.addData("FRBL", rotationalPower);
+
+
+
 
         if(gamepad1.dpad_up)
             robot.drive(1,1,1,1);
