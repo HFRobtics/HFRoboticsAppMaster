@@ -98,7 +98,7 @@ public class HardwareHFbot
         period.reset();
     }
     public void drive(double fl, double fr, double bl, double br ){
-        if(fl < 1 && fr < 1 && bl < 1 && br < 1) {
+        if(fl <= 1 && fr <= 1 && bl <= 1 && br <= 1) {
             double slowRatio = (3.0 / 4);
             frontrightMotor.setPower(fr * slowRatio);
             frontleftMotor.setPower(fl * slowRatio);

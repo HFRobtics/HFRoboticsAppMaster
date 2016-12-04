@@ -52,13 +52,13 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Mechanum", group="ROBOT")
+@TeleOp(name="Mecanum", group="ROBOT")
 //@Disabled
 public class BenTeleOp extends OpMode {
 
     /* Declare OpMode members.s */
     HardwareHFbot robot       = new HardwareHFbot(); // use the class created to define a Pushbot's hardware
-    double thresh = 0.1;
+    double thresh = 0.05;
     /*
      * Code to run ONCE when the driver hits INIT
      */
@@ -102,7 +102,7 @@ public class BenTeleOp extends OpMode {
         int quadrant = getQuadrant(rightStickX,rightStickY);
         double BaseSpeed = 0.5;
 
-        if(rightStickX > thresh || rightStickY > thresh){ //using joystick
+        if(rightStickX > thresh || rightStickY > thresh || rightStickX < -thresh || rightStickY < -thresh){ //using joystick
             switch (quadrant){
                 case 0:
                     robot.drive(0,0,0,0);
@@ -162,6 +162,7 @@ public class BenTeleOp extends OpMode {
      */
     @Override
     public void stop() {
+        robot.drive(0,0,0,0);
     }
 
     public int getQuadrant(double xJoyPos, double yJoyPos){ //Returns Quadrant of joystick
