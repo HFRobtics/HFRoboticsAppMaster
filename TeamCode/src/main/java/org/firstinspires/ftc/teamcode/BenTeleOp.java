@@ -32,10 +32,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.firstinspires.ftc.teamcode;
 
-import android.media.AudioManager;
-import android.media.MediaPlayer;
-import android.net.Uri;
-
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -62,6 +58,7 @@ public class BenTeleOp extends OpMode {
 
     /* Declare OpMode members.s */
     HardwareHFbot robot       = new HardwareHFbot(); // use the class created to define a Pushbot's hardware
+    double thresh = 0.1;
     /*
      * Code to run ONCE when the driver hits INIT
      */
@@ -95,6 +92,7 @@ public class BenTeleOp extends OpMode {
      */
     @Override
     public void loop() {
+
         double rightStickX = gamepad1.right_stick_x;
         double rightStickY = -gamepad1.right_stick_y;
         double linearPower = rightStickY;
@@ -102,56 +100,61 @@ public class BenTeleOp extends OpMode {
         double leftTrigger = gamepad1.left_trigger;
         double rightTrigger = gamepad1.right_trigger;
         int quadrant = getQuadrant(rightStickX,rightStickY);
+        double BaseSpeed = 0.5;
 
-        switch (quadrant){
-            case 0:
-                robot.drive(0,0,0,0);
-            case 1 :
-                robot.drive(linearPower, rotationalPower, rotationalPower, linearPower); //Sets FR && BL to Rotational in Quadrant 1
-                break;
-            case 2:
-                robot.drive(rotationalPower,linearPower,linearPower,rotationalPower); //Sets FL && BR to Rotational in Quadrant 2
-                break;
-            case 3 :
-                robot.drive(linearPower, rotationalPower, rotationalPower, linearPower); //Sets FR && BL to Rotational in Quadrant 3
-                break;
-            case 4:
-                robot.drive(rotationalPower,linearPower,linearPower,rotationalPower); //Sets FL && BR to Rotational in Quadrant 4
-                break;
-            case 5:
-                robot.drive(rightStickX,-rightStickX,-rightStickX,rightStickX); //Sets motors FL && BR to opposite X-vaule of FR && BL
-                break;
-
-        }
-
-        while((leftTrigger > 0 || rightTrigger > 0) && !(leftTrigger > 0 && rightTrigger > 0)){ //Checks is one trigger is down but not both
-            if(leftTrigger > 0){
-                robot.drive(0,leftTrigger,leftTrigger,0); //Sets FR && BL to leftTrigger vaule and will rotate robot left
-            }
-            if (rightTrigger > 0){
-                robot.drive(rightTrigger,0,0,rightTrigger); //Sets FL && BR to rightTrigger vaule and will rotate robot right
+        if(rightStickX > thresh || rightStickY > thresh){ //using joystick
+            switch (quadrant){
+                case 0:
+                    robot.drive(0,0,0,0);
+                case 1 :
+                    robot.drive(linearPower, rotationalPower, rotationalPower, linearPower); //Sets FR && BL to Rotational in Quadrant 1
+                    break;
+                case 2:
+                    robot.drive(rotationalPower,linearPower,linearPower,rotationalPower); //Sets FL && BR to Rotational in Quadrant 2
+                    break;
+                case 3 :
+                    robot.drive(linearPower, rotationalPower, rotationalPower, linearPower); //Sets FR && BL to Rotational in Quadrant 3
+                    break;
+                case 4:
+                    robot.drive(rotationalPower,linearPower,linearPower,rotationalPower); //Sets FL && BR to Rotational in Quadrant 4
+                    break;
+                case 5:
+                    robot.drive(rightStickX,-rightStickX,-rightStickX,rightStickX); //Sets motors FL && BR to opposite X-vaule of FR && BL
+                    break;
             }
         }
-
-
+        else if ( rightTrigger > thresh){
+            robot.drive(rightTrigger,-rightTrigger,rightTrigger,-rightTrigger);
+        }
+        else if ( leftTrigger > thresh){
+            robot.drive(-leftTrigger,leftTrigger,-leftTrigger,leftTrigger);
+        }
+        /*else if (rightTrigger > thresh || leftTrigger > thresh) { //code throws infinite loop
+            while ((leftTrigger > 0 || rightTrigger > 0) && !(leftTrigger > 0 && rightTrigger > 0)) { //Checks is one trigger is down but not both
+                if (leftTrigger > 0) {
+                    robot.drive(0, leftTrigger, leftTrigger, 0); //Sets FR && BL to leftTrigger vaule and will rotate robot left
+                }
+                if (rightTrigger > 0) {
+                    robot.drive(rightTrigger, 0, 0, rightTrigger); //Sets FL && BR to rightTrigger vaule and will rotate robot right
+                }
+            }
+        }*/
+        else if(gamepad1.dpad_up)
+            robot.drive(BaseSpeed,BaseSpeed,BaseSpeed,BaseSpeed);
+        else if(gamepad1.dpad_down)
+            robot.drive(-BaseSpeed,-BaseSpeed,-BaseSpeed,-BaseSpeed);
+        else if(gamepad1.dpad_left)
+            robot.drive(-BaseSpeed,BaseSpeed,BaseSpeed,-BaseSpeed);
+        else if(gamepad1.dpad_right)
+            robot.drive(BaseSpeed,-BaseSpeed,-BaseSpeed,BaseSpeed);
+        else
+            robot.drive(0,0,0,0);
 
         telemetry.addData("Joy Y", rightStickY);
         telemetry.addData("Joy X", rightStickX);
         telemetry.addData("FLBR", linearPower);
         telemetry.addData("FRBL", rotationalPower);
         telemetry.addData("Quadrant", quadrant);
-
-
-
-
-        if(gamepad1.dpad_up)
-            robot.drive(1,1,1,1);
-        if(gamepad1.dpad_down)
-            robot.drive(-1,-1,-1,-1);
-        if(gamepad1.dpad_left)
-            robot.drive(-1,1,-1,1);
-        if(gamepad1.dpad_right)
-            robot.drive(1,-1,1,-1);
     }
 
     /*
