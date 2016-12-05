@@ -93,9 +93,11 @@ public class BenTeleOp extends OpMode {
     @Override
     public void loop() {
 
-        double rightStickX = gamepad1.right_stick_x;
-        double rightStickY = -gamepad1.right_stick_y;
-        double linearPower = rightStickY;
+        double rawRstickX = gamepad.right_stick_x;
+        double rawRstickY = -gamepad.right_stick_y;
+        double rightStickX = circleToSquare(rawRStickX);
+        double rightStickY = circleToSquare(rawRStickY);
+        double linearPower = rawRstickY;
         double rotationalPower = rightStickY - rightStickX;
         double leftTrigger = gamepad1.left_trigger;
         double rightTrigger = gamepad1.right_trigger;
@@ -175,4 +177,13 @@ public class BenTeleOp extends OpMode {
         return 1;
     }
 
+    public double circleToSquare(double joyInput)
+    {
+        if(joyInput < 0)
+        {
+            return -(Math.pow(joyInput, 2))
+        }else{
+            return Math.pow(joyInput, 2)
+        }
+    }
 }
