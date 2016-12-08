@@ -93,40 +93,43 @@ public class BenTeleOp extends OpMode {
     @Override
     public void loop() {
 
-        double rightStickX = gamepad1.right_stick_x;
-        double rightStickY = -gamepad1.right_stick_y;
-        double linearPower = rightStickY;
+        double rawRightStickX = gamepad1.right_stick_x;
+        double rawRightStickY = -gamepad1.right_stick_y;
+        gamepad1.setJoystickDeadzone(0.1f);
+        double linearPower = rawRightStickY;
+        double rightStickX = squareToCirlce(rawRightStickX);
+        double rightStickY = squareToCirlce(rawRightStickY);
         double rotationalPower = rightStickY - rightStickX;
         double leftTrigger = gamepad1.left_trigger;
         double rightTrigger = gamepad1.right_trigger;
-        int quadrant = getQuadrant(rightStickX,rightStickY);
-        double BaseSpeed = 0.5;
-
-        if(rightStickX > thresh || rightStickY > thresh || rightStickX < -thresh || rightStickY < -thresh){ //using joystick
-            switch (quadrant){
+        int quadrant = getQuadrant(rawRightStickX,rawRightStickY);
+        double BaseSpeed = 0.25;
+        if(gamepad1.right_stick_x != 0 || gamepad1.right_stick_y != 0) {
+            switch (quadrant) {
                 case 0:
-                    robot.drive(0,0,0,0);
-                case 1 :
+                    robot.drive(0, 0, 0, 0);
+                case 1:
                     robot.drive(linearPower, rotationalPower, rotationalPower, linearPower); //Sets FR && BL to Rotational in Quadrant 1
                     break;
                 case 2:
-                    robot.drive(rotationalPower,linearPower,linearPower,rotationalPower); //Sets FL && BR to Rotational in Quadrant 2
+                    robot.drive(rotationalPower, linearPower, linearPower, rotationalPower); //Sets FL && BR to Rotational in Quadrant 2
                     break;
-                case 3 :
+                case 3:
                     robot.drive(linearPower, rotationalPower, rotationalPower, linearPower); //Sets FR && BL to Rotational in Quadrant 3
                     break;
                 case 4:
-                    robot.drive(rotationalPower,linearPower,linearPower,rotationalPower); //Sets FL && BR to Rotational in Quadrant 4
+                    robot.drive(rotationalPower, linearPower, linearPower, rotationalPower); //Sets FL && BR to Rotational in Quadrant 4
                     break;
                 case 5:
-                    robot.drive(rightStickX,-rightStickX,-rightStickX,rightStickX); //Sets motors FL && BR to opposite X-vaule of FR && BL
+                    robot.drive(rightStickX, -rightStickX, -rightStickX, rightStickX); //Sets motors FL && BR to opposite X-vaule of FR && BL
                     break;
             }
         }
-        else if ( rightTrigger > thresh){
+
+        if ( rightTrigger > .1f){
             robot.drive(rightTrigger,-rightTrigger,rightTrigger,-rightTrigger);
         }
-        else if ( leftTrigger > thresh){
+        else if ( leftTrigger > .1f){
             robot.drive(-leftTrigger,leftTrigger,-leftTrigger,leftTrigger);
         }
         /*else if (rightTrigger > thresh || leftTrigger > thresh) { //code throws infinite loop
@@ -149,6 +152,13 @@ public class BenTeleOp extends OpMode {
             robot.drive(BaseSpeed,-BaseSpeed,-BaseSpeed,BaseSpeed);
         else
             robot.drive(0,0,0,0);
+
+        if (gamepad1.a)
+        {
+            robot.shoot(1);
+        }else{
+            robot.shoot(0);
+        }
 
         telemetry.addData("Joy Y", rightStickY);
         telemetry.addData("Joy X", rightStickX);
@@ -173,6 +183,16 @@ public class BenTeleOp extends OpMode {
         if (yJoyPos > 0 && xJoyPos < 0) return 4;
         if (yJoyPos == 0 && (xJoyPos == 1 || xJoyPos == -1)) return 5;
         return 1;
+    }
+
+    public static double squareToCirlce(double joyvalue)
+    {
+        if(joyvalue < 1)
+        {
+            return -(joyvalue * joyvalue);
+        }else {
+            return (joyvalue * joyvalue);
+        }
     }
 
 }
