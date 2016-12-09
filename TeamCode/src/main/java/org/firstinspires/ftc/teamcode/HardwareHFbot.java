@@ -125,6 +125,9 @@ public class HardwareHFbot
             drive(0,0,0,0);
         }
     }
+    public void drive(double flbr, double frbl){
+        drive(flbr,frbl,frbl,flbr);
+    }
     public void shoot (double speed){
         //gamemode 1
         //give JA7ja minecraft:diamond 64

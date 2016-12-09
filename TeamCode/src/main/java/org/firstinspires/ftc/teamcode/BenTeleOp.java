@@ -142,14 +142,22 @@ public class BenTeleOp extends OpMode {
                 }
             }
         }*/
+        else if(gamepad1.dpad_up &&gamepad1.dpad_left)
+            robot.drive(BaseSpeed,0);
+        else if(gamepad1.dpad_up &&gamepad1.dpad_right)
+            robot.drive(0,BaseSpeed);
+        else if(gamepad1.dpad_down &&gamepad1.dpad_left)
+            robot.drive(0,-BaseSpeed);
+        else if(gamepad1.dpad_down &&gamepad1.dpad_right)
+            robot.drive(-BaseSpeed,0);
         else if(gamepad1.dpad_up)
-            robot.drive(BaseSpeed,BaseSpeed,BaseSpeed,BaseSpeed);
+            robot.drive(BaseSpeed,BaseSpeed);
         else if(gamepad1.dpad_down)
-            robot.drive(-BaseSpeed,-BaseSpeed,-BaseSpeed,-BaseSpeed);
+            robot.drive(-BaseSpeed,-BaseSpeed);
         else if(gamepad1.dpad_left)
-            robot.drive(-BaseSpeed,BaseSpeed,BaseSpeed,-BaseSpeed);
+            robot.drive(-BaseSpeed,BaseSpeed);
         else if(gamepad1.dpad_right)
-            robot.drive(BaseSpeed,-BaseSpeed,-BaseSpeed,BaseSpeed);
+            robot.drive(BaseSpeed,-BaseSpeed);
         else
             robot.drive(0,0,0,0);
 
