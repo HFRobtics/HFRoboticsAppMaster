@@ -36,32 +36,33 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 
-
 /**
  * This file provides basic Telop driving for a Pushbot robot.
  * The code sis structured as an Iterative OpMode
- *
+ * <p>
  * This OpMode uses the common Pushbot hardware class to define the devices on the robot.
  * All device access is managed through the HardwarePushbot class.
- *
+ * <p>
  * This particular OpMode executes a basic Tank Drive Teleop for a PushBot
  * It raises and lowers the claw using the Gampad Y and A buttons respectively.
  * It also opens and closes the claws slowly using the left and right Bumper buttons.
- *
+ * <p>
  * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Mecanum", group="ROBOT")
+@TeleOp(name = "Mecanum", group = "ROBOT")
 //@Disabled
 public class BenTeleOp extends OpMode {
 
     /* Declare OpMode members.s */
-    HardwareHFbot robot       = new HardwareHFbot(); // use the class created to define a Pushbot's hardware
+    HardwareHFbot robot = new HardwareHFbot(); // use the class created to define a Pushbot's hardware
     double thresh = 0.05;
     /*
      * Code to run ONCE when the driver hits INIT
      */
+
+
     @Override
     public void init() {
         /* Initialize the hardware variables.
@@ -71,6 +72,9 @@ public class BenTeleOp extends OpMode {
 
         // Send telemetry message to signify robot waiting;
         telemetry.addData("Say", "Hello Driver");
+        telemetry.addData("Song", "This Grill");
+
+
     }
 
     /*
@@ -78,13 +82,16 @@ public class BenTeleOp extends OpMode {
      */
     @Override
     public void init_loop() {
+
     }
+
 
     /*
      * Code to run ONCE when the driver hits PLAY
      */
     @Override
     public void start() {
+
     }
 
     /*
@@ -93,86 +100,51 @@ public class BenTeleOp extends OpMode {
     @Override
     public void loop() {
 
-        double rawRightStickX = gamepad1.right_stick_x;
-        double rawRightStickY = -gamepad1.right_stick_y;
         gamepad1.setJoystickDeadzone(0.1f);
-        double linearPower = rawRightStickY;
-        double rightStickX = squareToCirlce(rawRightStickX);
-        double rightStickY = squareToCirlce(rawRightStickY);
-        double rotationalPower = rightStickY - rightStickX;
         double leftTrigger = gamepad1.left_trigger;
         double rightTrigger = gamepad1.right_trigger;
-        int quadrant = getQuadrant(rawRightStickX,rawRightStickY);
-        double BaseSpeed = 0.25;
-        if(gamepad1.right_stick_x != 0 || gamepad1.right_stick_y != 0) {
-            switch (quadrant) {
-                case 0:
-                    robot.drive(0, 0, 0, 0);
-                case 1:
-                    robot.drive(linearPower, rotationalPower, rotationalPower, linearPower); //Sets FR && BL to Rotational in Quadrant 1
-                    break;
-                case 2:
-                    robot.drive(rotationalPower, linearPower, linearPower, rotationalPower); //Sets FL && BR to Rotational in Quadrant 2
-                    break;
-                case 3:
-                    robot.drive(linearPower, rotationalPower, rotationalPower, linearPower); //Sets FR && BL to Rotational in Quadrant 3
-                    break;
-                case 4:
-                    robot.drive(rotationalPower, linearPower, linearPower, rotationalPower); //Sets FL && BR to Rotational in Quadrant 4
-                    break;
-                case 5:
-                    robot.drive(rightStickX, -rightStickX, -rightStickX, rightStickX); //Sets motors FL && BR to opposite X-vaule of FR && BL
-                    break;
-            }
-        }
+        double BaseSpeed = 0.5;
 
-        if ( rightTrigger > .1f){
-            robot.drive(rightTrigger,-rightTrigger,rightTrigger,-rightTrigger);
-        }
-        else if ( leftTrigger > .1f){
-            robot.drive(-leftTrigger,leftTrigger,-leftTrigger,leftTrigger);
-        }
-        /*else if (rightTrigger > thresh || leftTrigger > thresh) { //code throws infinite loop
-            while ((leftTrigger > 0 || rightTrigger > 0) && !(leftTrigger > 0 && rightTrigger > 0)) { //Checks is one trigger is down but not both
-                if (leftTrigger > 0) {
-                    robot.drive(0, leftTrigger, leftTrigger, 0); //Sets FR && BL to leftTrigger vaule and will rotate robot left
-                }
-                if (rightTrigger > 0) {
-                    robot.drive(rightTrigger, 0, 0, rightTrigger); //Sets FL && BR to rightTrigger vaule and will rotate robot right
-                }
-            }
-        }*/
-        else if(gamepad1.dpad_up &&gamepad1.dpad_left)
-            robot.drive(BaseSpeed,0);
-        else if(gamepad1.dpad_up &&gamepad1.dpad_right)
-            robot.drive(0,BaseSpeed);
-        else if(gamepad1.dpad_down &&gamepad1.dpad_left)
-            robot.drive(0,-BaseSpeed);
-        else if(gamepad1.dpad_down &&gamepad1.dpad_right)
-            robot.drive(-BaseSpeed,0);
-        else if(gamepad1.dpad_up)
-            robot.drive(BaseSpeed,BaseSpeed);
-        else if(gamepad1.dpad_down)
-            robot.drive(-BaseSpeed,-BaseSpeed);
-        else if(gamepad1.dpad_left)
-            robot.drive(-BaseSpeed,BaseSpeed);
-        else if(gamepad1.dpad_right)
-            robot.drive(BaseSpeed,-BaseSpeed);
+        if (rightTrigger > .1f) {
+            robot.drive(rightTrigger, -rightTrigger, rightTrigger, -rightTrigger);
+        } else if (leftTrigger > .1f) {
+            robot.drive(-leftTrigger, leftTrigger, -leftTrigger, leftTrigger);
+        } else if (gamepad1.dpad_up && gamepad1.dpad_left)
+            robot.drive(0, BaseSpeed);
+        else if (gamepad1.dpad_up && gamepad1.dpad_right)
+            robot.drive(BaseSpeed, 0);
+        else if (gamepad1.dpad_down && gamepad1.dpad_left)
+            robot.drive(-BaseSpeed, 0);
+        else if (gamepad1.dpad_down && gamepad1.dpad_right)
+            robot.drive(0, -BaseSpeed);
+        else if (gamepad1.dpad_up)
+            robot.drive(BaseSpeed, BaseSpeed);
+        else if (gamepad1.dpad_down)
+            robot.drive(-BaseSpeed, -BaseSpeed);
+        else if (gamepad1.dpad_left)
+            robot.drive(-BaseSpeed, BaseSpeed);
+        else if (gamepad1.dpad_right)
+            robot.drive(BaseSpeed, -BaseSpeed);
         else
-            robot.drive(0,0,0,0);
+            robot.drive(0, 0, 0, 0);
 
-        if (gamepad1.a)
-        {
+        if (gamepad2.x) {
             robot.shoot(1);
-        }else{
+        } else {
             robot.shoot(0);
         }
+        if (gamepad2.b) {
+            robot.antiShoot(-1);
+        }
 
-        telemetry.addData("Joy Y", rightStickY);
-        telemetry.addData("Joy X", rightStickX);
-        telemetry.addData("FLBR", linearPower);
-        telemetry.addData("FRBL", rotationalPower);
-        telemetry.addData("Quadrant", quadrant);
+        if (gamepad1.y) {
+            robot.reversed = !robot.reversed;
+        }
+
+        robot.drive(RobotDirectionDrive.FOWARD, 10);
+
+        telemetry.addData("Reversed", robot.reversed);
+        telemetry.addData("Direction", robot.frontleftMotor.getDirection());
     }
 
     /*
@@ -180,10 +152,10 @@ public class BenTeleOp extends OpMode {
      */
     @Override
     public void stop() {
-        robot.drive(0,0,0,0);
+        robot.drive(0, 0, 0, 0);
     }
 
-    public int getQuadrant(double xJoyPos, double yJoyPos){ //Returns Quadrant of joystick
+    public int getQuadrant(double xJoyPos, double yJoyPos) { //Returns Quadrant of joystick
         if (yJoyPos == 0 && xJoyPos == 0) return 0;
         if (yJoyPos > 0 && xJoyPos > 0) return 1;
         if (yJoyPos < 0 && xJoyPos > 0) return 2;
@@ -193,12 +165,10 @@ public class BenTeleOp extends OpMode {
         return 1;
     }
 
-    public static double squareToCirlce(double joyvalue)
-    {
-        if(joyvalue < 1)
-        {
+    public static double squareToCirlce(double joyvalue) {
+        if (joyvalue < 1) {
             return -(joyvalue * joyvalue);
-        }else {
+        } else {
             return (joyvalue * joyvalue);
         }
     }

@@ -56,17 +56,20 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="BASIC", group="Robot")
+@Autonomous(name="BasicBlue", group="Robot")
 //@Disabled
 public class BasicAuto extends LinearOpMode {
 
     /* Declare OpMode members. */
-    HardwareHFbot robot       = new HardwareHFbot();   // Use a HF Bots hardware
-    private ElapsedTime     runtime = new ElapsedTime();
+    HardwareHFbot robot = new HardwareHFbot();   // Use a HF Bots hardware
+    private ElapsedTime runtime = new ElapsedTime();
+
 
 
     @Override
     public void runOpMode() {
+
+
 
         /*
          * Initialize the drive system variables.
@@ -78,6 +81,8 @@ public class BasicAuto extends LinearOpMode {
         telemetry.addData("Status", "Ready to run");    //
         telemetry.update();
 
+
+
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
@@ -86,7 +91,14 @@ public class BasicAuto extends LinearOpMode {
         // Step 1:  Drive forward for 3 seconds
         robot.drive(0.25,0.25);
         runtime.reset();
-        while (opModeIsActive() && (runtime.seconds() < 3.0)) {
+        while (opModeIsActive() && (runtime.seconds() <= (56/11))) {
+            telemetry.addData("Path", "Leg 1: %2.5f S Elapsed", runtime.seconds());
+            telemetry.update();
+        }
+
+        robot.drive(0.25,-0.25);
+        runtime.reset();
+        while (opModeIsActive() && (runtime.seconds() <= (2))) {
             telemetry.addData("Path", "Leg 1: %2.5f S Elapsed", runtime.seconds());
             telemetry.update();
         }
@@ -112,8 +124,8 @@ public class BasicAuto extends LinearOpMode {
         // Step 4:  Stop and close the claw.
         robot.drive(0,0);
 
-        telemetry.addData("Path", "Complete");
-        telemetry.update();
+        //telemetry.addData("Path", "Complete");
+        //telemetry.update();
         sleep(1000);
     }
 }
