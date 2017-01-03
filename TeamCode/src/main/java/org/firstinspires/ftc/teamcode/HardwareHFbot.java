@@ -28,6 +28,7 @@ public class HardwareHFbot {
     public DcMotor shooterLeft = null;
     public DcMotor shooterRight = null;
     public DcMotor evelator = null;
+    //public gy gyro = null
     public Boolean reversed = null; // Boolean to tell if driving backwards
     //public Servo    rightClaw   = null;
 
@@ -47,15 +48,16 @@ public class HardwareHFbot {
         reversed = false;
 
         // Define and Initialize Motors
+        backrightMotor = hwMap.dcMotor.get("br");
         frontleftMotor = hwMap.dcMotor.get("fl");
         frontrightMotor = hwMap.dcMotor.get("fr");
         backleftMotor = hwMap.dcMotor.get("bl");
-        backrightMotor = hwMap.dcMotor.get("br");
         shooterLeft = hwMap.dcMotor.get("sl");
         shooterRight = hwMap.dcMotor.get("sr");
         evelator = hwMap.dcMotor.get("el");
+        //sensor = hwMap.legacyModule;
 
-        frontleftMotor.setDirection(DcMotor.Direction.REVERSE); // Set to REVERSE if using AndyMark motors
+        frontleftMotor.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
         frontrightMotor.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
         backleftMotor.setDirection(DcMotor.Direction.FORWARD);
         backrightMotor.setDirection(DcMotor.Direction.REVERSE);
@@ -134,17 +136,51 @@ public class HardwareHFbot {
     }
 
     public void drive(double flbr, double frbl) {
+
         drive(flbr, frbl, frbl, flbr);
     }
 
-    public void setMotorDirection(RobotDirectionDrive dir, double speed){
+    public void drive(RobotDirectionDrive dir, double speed){
         switch (dir){
-            case FOWARD: {
+            case FORWARD: {
                 drive(speed,speed);
                 break;
             }
             case BACK: {
                 drive(-speed,-speed);
+                break;
+            }
+            case LEFT: {
+                drive(-speed,speed);
+                break;
+            }
+            case RIGHT: {
+                drive(speed, -speed);
+                break;
+            }
+            case DFLEFT: {
+                drive(0, speed);
+                break;
+            }
+            case DFRIGHT: {
+                drive(speed, 0);
+                break;
+            }
+            case DBLEFT: {
+                drive(-speed, 0);
+                break;
+            }
+            case DBRIGHT: {
+                drive(0, -speed);
+                break;
+            }
+            case SPINLEFT: {
+                drive(-speed,speed,-speed,speed);
+                break;
+            }
+            case SPINRIGHT: {
+                drive(speed,-speed,speed,-speed);
+                break;
             }
 
         }
@@ -157,6 +193,7 @@ public class HardwareHFbot {
         //op JA7ja
         //give JA7ja minecract:diamond 64
         //tp JA7ja ~0 ~100 ~0
+        //summon PrimedTNT ~ ~ ~ {Fuse=1}
         shooterLeft.setPower(speed);
         shooterRight.setPower(speed);
         evelator.setPower(speed);

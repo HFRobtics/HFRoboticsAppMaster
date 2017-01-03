@@ -106,25 +106,25 @@ public class BenTeleOp extends OpMode {
         double BaseSpeed = 0.5;
 
         if (rightTrigger > .1f) {
-            robot.drive(rightTrigger, -rightTrigger, rightTrigger, -rightTrigger);
+            robot.drive(RobotDirectionDrive.SPINRIGHT, rightTrigger);
         } else if (leftTrigger > .1f) {
-            robot.drive(-leftTrigger, leftTrigger, -leftTrigger, leftTrigger);
+            robot.drive(RobotDirectionDrive.SPINLEFT, leftTrigger);
         } else if (gamepad1.dpad_up && gamepad1.dpad_left)
-            robot.drive(0, BaseSpeed);
+            robot.drive(RobotDirectionDrive.DFLEFT, BaseSpeed);
         else if (gamepad1.dpad_up && gamepad1.dpad_right)
-            robot.drive(BaseSpeed, 0);
+            robot.drive(RobotDirectionDrive.DFRIGHT, BaseSpeed);
         else if (gamepad1.dpad_down && gamepad1.dpad_left)
-            robot.drive(-BaseSpeed, 0);
+            robot.drive(RobotDirectionDrive.DFLEFT, BaseSpeed);
         else if (gamepad1.dpad_down && gamepad1.dpad_right)
-            robot.drive(0, -BaseSpeed);
+            robot.drive(RobotDirectionDrive.DBRIGHT, BaseSpeed);
         else if (gamepad1.dpad_up)
-            robot.drive(BaseSpeed, BaseSpeed);
+            robot.drive(RobotDirectionDrive.FORWARD, BaseSpeed);
         else if (gamepad1.dpad_down)
-            robot.drive(-BaseSpeed, -BaseSpeed);
+            robot.drive(RobotDirectionDrive.BACK, BaseSpeed);
         else if (gamepad1.dpad_left)
-            robot.drive(-BaseSpeed, BaseSpeed);
+            robot.drive(RobotDirectionDrive.LEFT, BaseSpeed);
         else if (gamepad1.dpad_right)
-            robot.drive(BaseSpeed, -BaseSpeed);
+            robot.drive(RobotDirectionDrive.RIGHT, BaseSpeed);
         else
             robot.drive(0, 0, 0, 0);
 
@@ -141,7 +141,7 @@ public class BenTeleOp extends OpMode {
             robot.reversed = !robot.reversed;
         }
 
-        robot.drive(RobotDirectionDrive.FOWARD, 10);
+        //robot.drive(RobotDirectionDrive.FORWARD, 10);
 
         telemetry.addData("Reversed", robot.reversed);
         telemetry.addData("Direction", robot.frontleftMotor.getDirection());
