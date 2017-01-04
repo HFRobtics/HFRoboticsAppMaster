@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
 import org.lasarobotics.vision.android.Cameras;
 import org.lasarobotics.vision.ftc.resq.Beacon;
 import org.lasarobotics.vision.opmode.VisionOpMode;
@@ -17,7 +19,12 @@ import org.opencv.core.Size;
  * The VisionOpMode is the base of all vision processing and other styles of OpMode
  * even extend the VisionOpMode class! Be sure to extend it if writing your own OpMode structure.
  */
+
+@TeleOp(name = "Do you see what I see?", group = "ROBOT")
+//@Disabled
 public class BasicVisionSample extends VisionOpMode {
+
+    HardwareHFbot robot = new HardwareHFbot();
 
     @Override
     public void init() {
@@ -49,7 +56,7 @@ public class BasicVisionSample extends VisionOpMode {
          * Set the beacon analysis method
          * Try them all and see what works!
          */
-        beacon.setAnalysisMethod(Beacon.AnalysisMethod.FAST);
+        beacon.setAnalysisMethod(Beacon.AnalysisMethod.COMPLEX);
 
         /**
          * Set color tolerances
