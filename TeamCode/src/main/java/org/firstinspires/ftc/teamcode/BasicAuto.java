@@ -63,7 +63,11 @@ public class BasicAuto extends LinearOpMode {
     /* Declare OpMode members. */
     HardwareHFbot robot = new HardwareHFbot();   // Use a HF Bots hardware
     private ElapsedTime runtime = new ElapsedTime();
-
+    double toFirstBeacon;
+    double toBeaconLeft;
+    double toBeaconRight;
+    double toSecondBeaconFromFirstBlue;
+    double toSecondBeaconFromFirstRed;
 
 
     @Override
@@ -91,9 +95,14 @@ public class BasicAuto extends LinearOpMode {
         // Step 1:  Drive forward for 3 seconds
         robot.drive(0.25,0.25);
         runtime.reset();
-        while (opModeIsActive() && (runtime.seconds() <= (56/11))) {
-            telemetry.addData("Path", "Leg 1: %2.5f S Elapsed", runtime.seconds());
+        while (opModeIsActive() && (runtime.seconds() <= (toFirstBeacon))) {
+            telemetry.addData("Moving to first beacon...", runtime.seconds());
             telemetry.update();
+        }
+
+        if(LinearVisionSample.beacon.getAnalysis().getColorString().equals("red, blue"))
+        {
+
         }
 
         robot.drive(0.25,-0.25);
@@ -123,6 +132,8 @@ public class BasicAuto extends LinearOpMode {
 
         // Step 4:  Stop and close the claw.
         robot.drive(0,0);
+
+
 
         //telemetry.addData("Path", "Complete");
         //telemetry.update();

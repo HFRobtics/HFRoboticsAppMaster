@@ -19,7 +19,7 @@ public class AutoWIthEncoders extends LinearOpMode {
     static final double     WHEEL_DIAMETER_INCHES   = 3.75 ;     // For figuring circumference
     static final double     BACK_COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * BACK_DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_INCHES * 3.1415);
     static final double     FRONT_COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * FRONT_DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_INCHES * 3.1415);
-    static final double     DRIVE_SPEED             = 0.6;
+    static final double     DRIVE_SPEED             = 0.25;
     static final double     TURN_SPEED              = 0.5;
 
     @Override
@@ -53,7 +53,7 @@ public class AutoWIthEncoders extends LinearOpMode {
 
         // Step through each leg of the path,
         // Note: Reverse movement is obtained by setting a negative distance (not speed)
-        encoderDrive(DRIVE_SPEED,  100, 5.0);  // S1: Forward 47 Inches with 5 Sec timeout
+        encoderDrive(DRIVE_SPEED,  100, 20.0);  // S1: Forward 47 Inches with 5 Sec timeout
           // S3: Reverse 24 Inches with 4 Sec timeout
     }
 
@@ -77,15 +77,16 @@ public class AutoWIthEncoders extends LinearOpMode {
         if (opModeIsActive()) {
 
             // Determine new target position, and pass to motor controller
-            newFrontLeftTarget = robot.frontleftMotor.getCurrentPosition() + (int) (inches * FRONT_COUNTS_PER_INCH);
+            /*newFrontLeftTarget = robot.frontleftMotor.getCurrentPosition() + (int) (inches * FRONT_COUNTS_PER_INCH);
             newBackRightTarget = robot.backrightMotor.getCurrentPosition() + (int) (inches * BACK_COUNTS_PER_INCH);
             newFrontRightTarget = robot.frontrightMotor.getCurrentPosition() + (int) (inches * FRONT_COUNTS_PER_INCH);
             newBackLeftTarget = robot.backleftMotor.getCurrentPosition() + (int) (inches * BACK_COUNTS_PER_INCH);
-            robot.frontleftMotor.setTargetPosition(newFrontLeftTarget);
-            telemetry.addData("Front Targer", newFrontLeftTarget);
-            robot.backrightMotor.setTargetPosition(newBackRightTarget);
-            robot.frontrightMotor.setTargetPosition(newFrontRightTarget);
-            robot.backleftMotor.setTargetPosition(newBackLeftTarget);
+            */
+            robot.frontleftMotor.setTargetPosition(robot.frontleftMotor.getCurrentPosition() + 10000);
+            //telemetry.addData("Front Targer", newFrontLeftTarget);
+            robot.backrightMotor.setTargetPosition(robot.backrightMotor.getCurrentPosition() + 10000);
+            robot.frontrightMotor.setTargetPosition(robot.frontrightMotor.getCurrentPosition() + 10000);
+            robot.backleftMotor.setTargetPosition(robot.backleftMotor.getCurrentPosition() + 10000);
 
             // Turn On RUN_TO_POSITION
             robot.frontleftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -97,8 +98,8 @@ public class AutoWIthEncoders extends LinearOpMode {
             runtime.reset();
 
 
-        robot.frontleftMotor.setPower(Math.abs(speed));
-        robot.frontrightMotor.setPower(Math.abs(speed));
+        robot.frontleftMotor.setPower(Math.abs(speed * .75));
+        robot.frontrightMotor.setPower(Math.abs(speed * .75));
         robot.backleftMotor.setPower(Math.abs(speed));
         robot.backrightMotor.setPower(Math.abs(speed));
 
