@@ -114,7 +114,7 @@ public class BenTeleOp extends OpMode {
         else if (gamepad1.dpad_up && gamepad1.dpad_right)
             robot.drive(RobotDirectionDrive.DFRIGHT, BaseSpeed);
         else if (gamepad1.dpad_down && gamepad1.dpad_left)
-            robot.drive(RobotDirectionDrive.DFLEFT, BaseSpeed);
+            robot.drive(RobotDirectionDrive.DBLEFT, BaseSpeed);
         else if (gamepad1.dpad_down && gamepad1.dpad_right)
             robot.drive(RobotDirectionDrive.DBRIGHT, BaseSpeed);
         else if (gamepad1.dpad_up)

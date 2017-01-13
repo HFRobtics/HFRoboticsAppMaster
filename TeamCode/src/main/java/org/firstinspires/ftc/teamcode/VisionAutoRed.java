@@ -245,7 +245,7 @@ public class VisionAutoRed extends LinearVisionOpMode {
 
         wait(1000);
 
-        if(LinearVisionSample.beacon.getAnalysis().getColorString().equals("red, blue"))
+        if(beacon.getAnalysis().getColorString().equals("red, blue"))
         {
 
             driveToBeaconLeft();
@@ -254,13 +254,13 @@ public class VisionAutoRed extends LinearVisionOpMode {
 
             wait(1000);
 
-            if(LinearVisionSample.beacon.getAnalysis().getColorString().equals("red, blue"))
+            if(beacon.getAnalysis().getColorString().equals("red, blue"))
             {
 
                 driveToBeaconLeft();
                 driveToBeaconButton();
 
-            }else if(LinearVisionSample.beacon.getAnalysis().getColorString().equals("blue, red"))
+            }else if(beacon.getAnalysis().getColorString().equals("blue, red"))
             {
 
                 driveToBeaconRight();
@@ -271,7 +271,7 @@ public class VisionAutoRed extends LinearVisionOpMode {
                 endAutonomous();
 
             }
-        }else if(LinearVisionSample.beacon.getAnalysis().getColorString().equals("blue, red")){
+        }else if(beacon.getAnalysis().getColorString().equals("blue, red")){
 
             driveToBeaconRight();
             driveToBeaconButton();
@@ -279,13 +279,13 @@ public class VisionAutoRed extends LinearVisionOpMode {
 
             wait(1000);
 
-            if(LinearVisionSample.beacon.getAnalysis().getColorString().equals("red, blue"))
+            if(beacon.getAnalysis().getColorString().equals("red, blue"))
             {
 
                 driveToBeaconLeft();
                 driveToBeaconButton();
 
-            }else if(LinearVisionSample.beacon.getAnalysis().getColorString().equals("blue, red"))
+            }else if(beacon.getAnalysis().getColorString().equals("blue, red"))
             {
 
                 driveToBeaconRight();
@@ -302,13 +302,13 @@ public class VisionAutoRed extends LinearVisionOpMode {
 
             wait(1000);
 
-            if(LinearVisionSample.beacon.getAnalysis().getColorString().equals("red, blue"))
+            if(beacon.getAnalysis().getColorString().equals("red, blue"))
             {
 
                 driveToBeaconLeft();
                 driveToBeaconButton();
 
-            }else if(LinearVisionSample.beacon.getAnalysis().getColorString().equals("blue, red"))
+            }else if(beacon.getAnalysis().getColorString().equals("blue, red"))
             {
 
                 driveToBeaconRight();

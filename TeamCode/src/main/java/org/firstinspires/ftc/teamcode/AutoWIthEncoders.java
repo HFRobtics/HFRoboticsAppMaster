@@ -1,45 +1,44 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.lasarobotics.vision.android.Cameras;
+import org.lasarobotics.vision.ftc.resq.Beacon;
+import org.lasarobotics.vision.opmode.LinearVisionOpMode;
+import org.lasarobotics.vision.opmode.extensions.CameraControlExtension;
+import org.lasarobotics.vision.util.ScreenOrientation;
+import org.opencv.core.Size;
 
 /**
  * Created by bm121 on 12/14/2016.
  */
 @Autonomous(name="Auto Drive By Encoder", group="Robot")
-public class AutoWIthEncoders extends LinearOpMode {
+public class AutoWIthEncoders extends LinearVisionOpMode {
     HardwareHFbot robot = new HardwareHFbot();
     private ElapsedTime runtime = new ElapsedTime();
 
-    static final double     COUNTS_PER_MOTOR_REV    = 280 ;    // eg: TETRIX Motor Encoder
-    static final double     BACK_DRIVE_GEAR_REDUCTION    = 1.0 ;     // This is < 1.0 if geared UP
-    static final double     FRONT_DRIVE_GEAR_REDUCTION    = .75 ;     // This is < 1.0 if geared UP
-    static final double     WHEEL_DIAMETER_INCHES   = 3.75 ;     // For figuring circumference
-    static final double     BACK_COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * BACK_DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_INCHES * 3.1415);
-    static final double     FRONT_COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * FRONT_DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_INCHES * 3.1415);
     static final double     DRIVE_SPEED             = 0.25;
-    static final double     TURN_SPEED              = 0.5;
+    static final double     COUNTS_PER_INCH_FB         = 10000/108.0;
+    static final String     TEAMRED                    = "red";
+    static final String     TEAMBLUE                    = "blue";
+
 
     @Override
-    public void runOpMode() {
+    public void runOpMode() throws InterruptedException{
 
-        /*
-         * Initialize the drive system variables.
-         * The init() method of the hardware class does all the work here
-         */
         robot.init(hardwareMap);
 
         // Send telemetry message to signify robot waiting;
-        telemetry.addData("Status", "Resetting Encoders");    //
+        telemetry.addData("Status", "Resetting Encoders");
         telemetry.update();
 
         robot.frontleftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.backrightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.frontrightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.backleftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        idle();
+        waitOneFullHardwareCycle();
 
         robot.frontleftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.backrightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -47,14 +46,31 @@ public class AutoWIthEncoders extends LinearOpMode {
         robot.backleftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
 
+        waitForVisionStart();
+        this.setCamera(Cameras.PRIMARY);
+        this.setFrameSize(new Size(900, 900));
 
-        // Wait for the game to start (driver presses PLAY)
+
+        enableExtension(Extensions.BEACON);         //Beacon detection
+        enableExtension(Extensions.ROTATION);       //Automatic screen rotation correction
+        enableExtension(Extensions.CAMERA_CONTROL); //Manual camera control
+
+        beacon.setAnalysisMethod(Beacon.AnalysisMethod.COMPLEX);
+
+        beacon.setColorToleranceRed(0);
+        beacon.setColorToleranceBlue(0);
+
+        rotation.setIsUsingSecondaryCamera(false);
+        rotation.disableAutoRotate();
+        rotation.setActivityOrientationFixed(ScreenOrientation.PORTRAIT);
+
+        cameraControl.setColorTemperature(CameraControlExtension.ColorTemperature.AUTO);
+        cameraControl.setAutoExposureCompensation();
+
         waitForStart();
 
-        // Step through each leg of the path,
-        // Note: Reverse movement is obtained by setting a negative distance (not speed)
-        encoderDrive(DRIVE_SPEED,  100, 20.0);  // S1: Forward 47 Inches with 5 Sec timeout
-          // S3: Reverse 24 Inches with 4 Sec timeout
+
+        encoderDrive(DRIVE_SPEED,  39, 20.0);
     }
 
     /*
@@ -77,16 +93,17 @@ public class AutoWIthEncoders extends LinearOpMode {
         if (opModeIsActive()) {
 
             // Determine new target position, and pass to motor controller
-            /*newFrontLeftTarget = robot.frontleftMotor.getCurrentPosition() + (int) (inches * FRONT_COUNTS_PER_INCH);
-            newBackRightTarget = robot.backrightMotor.getCurrentPosition() + (int) (inches * BACK_COUNTS_PER_INCH);
-            newFrontRightTarget = robot.frontrightMotor.getCurrentPosition() + (int) (inches * FRONT_COUNTS_PER_INCH);
-            newBackLeftTarget = robot.backleftMotor.getCurrentPosition() + (int) (inches * BACK_COUNTS_PER_INCH);
-            */
-            robot.frontleftMotor.setTargetPosition(robot.frontleftMotor.getCurrentPosition() + 10000);
-            //telemetry.addData("Front Targer", newFrontLeftTarget);
-            robot.backrightMotor.setTargetPosition(robot.backrightMotor.getCurrentPosition() + 10000);
-            robot.frontrightMotor.setTargetPosition(robot.frontrightMotor.getCurrentPosition() + 10000);
-            robot.backleftMotor.setTargetPosition(robot.backleftMotor.getCurrentPosition() + 10000);
+            newFrontLeftTarget = robot.frontleftMotor.getCurrentPosition() + (int) (inches * COUNTS_PER_INCH_FB);
+            newBackRightTarget = robot.backrightMotor.getCurrentPosition() + (int) (inches * COUNTS_PER_INCH_FB);
+            newFrontRightTarget = robot.frontrightMotor.getCurrentPosition() + (int) (inches * COUNTS_PER_INCH_FB);
+            newBackLeftTarget = robot.backleftMotor.getCurrentPosition() + (int) (inches * COUNTS_PER_INCH_FB);
+
+            telemetry.addData("Target", newFrontLeftTarget);
+
+            robot.frontleftMotor.setTargetPosition(newFrontLeftTarget);
+            robot.backrightMotor.setTargetPosition(newBackRightTarget);
+            robot.frontrightMotor.setTargetPosition(newFrontRightTarget);
+            robot.backleftMotor.setTargetPosition(newBackLeftTarget);
 
             // Turn On RUN_TO_POSITION
             robot.frontleftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -113,6 +130,7 @@ public class AutoWIthEncoders extends LinearOpMode {
             telemetry.addData("Path2", "Running at %7d :%7d",
                     robot.frontleftMotor.getCurrentPosition(),
                     robot.frontrightMotor.getCurrentPosition());
+            telemetry.addData("Beacon Color", beacon.getAnalysis().getColorString());
             telemetry.update();
         }
 
@@ -131,5 +149,27 @@ public class AutoWIthEncoders extends LinearOpMode {
 
             //  sleep(250);   // optional pause after each move
         }
+    }
+
+    public static String getLeftOrRightColor(){
+        String full = beacon.getAnalysis().getColorString();
+        int indexOfComma = full.indexOf(",");
+        String left = full.substring(0,indexOfComma);
+        String right = full.substring(indexOfComma + 1, full.length());
+        if(left.toLowerCase().equals(TEAMRED)){
+            return left;
+        }
+        if(right.toLowerCase().equals(TEAMRED)){
+            return right;
+        }
+        return "none";
+    }
+
+    public static void rotate(double degrees){
+
+    }
+
+    public static void lowerServo(){
+
     }
 }

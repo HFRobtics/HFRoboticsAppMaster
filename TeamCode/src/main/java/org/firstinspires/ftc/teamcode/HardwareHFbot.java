@@ -28,6 +28,7 @@ public class HardwareHFbot {
     public DcMotor shooterLeft = null;
     public DcMotor shooterRight = null;
     public DcMotor evelator = null;
+    public static final double LENGTH = 17.25;
     //public gy gyro = null
     public Boolean reversed = null; // Boolean to tell if driving backwards
     //public Servo    rightClaw   = null;
