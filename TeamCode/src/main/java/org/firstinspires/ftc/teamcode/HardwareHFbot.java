@@ -2,36 +2,26 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-/**
- * This is NOT an opmode.
- * <p>
- * This class can be used to define all the specific hardware for a single robot.
- * In this case that robot is a HFBot.
- * <p>
- * This hardware class assumes the following device names have been configured on the robot:
- * Note:  All names are lower case and some have single spaces between words.
- * <p>
- * Motor channel:  Left  drive motor:        "left_drive"
- * Motor channel:  Right drive motor:        "right_drive"
- * Motor channel:  Manipulator drive motor:  "left_arm"
- * Servo channel:  Servo to open left claw:  "left_hand"s
- * Servo channel:  Servo to open right claw: "right_hand"
- */
+
 public class HardwareHFbot {
-    /* Public OpMode members. */
+    //Defines motors and servos for public use.
     public DcMotor frontleftMotor = null;
     public DcMotor frontrightMotor = null;
     public DcMotor backrightMotor = null;
     public DcMotor backleftMotor = null;
-    public DcMotor shooterLeft = null;
-    public DcMotor shooterRight = null;
-    public DcMotor evelator = null;
-    public static final double LENGTH = 17.25;
-    //public gy gyro = null
+    public DcMotor sweeper = null;
+    public DcMotor shooter = null;
+    public Servo   lifter = null;
+    public Servo   leftBeacon = null;
+    public Servo   rightBeacon = null;
+    public static final double LENGTH = 17.25;  //The length and width of robot. Used for autonomous.
+    public static final double WIDTH = 17.375;
+    public static final double FRONT_WHEEL_SLOW_RATIO = 0.75; //Used to slow front wheels because of gearing
     public Boolean reversed = null; // Boolean to tell if driving backwards
-    //public Servo    rightClaw   = null;
+
 
     /* local OpMode members. */
     HardwareMap hwMap = null;
@@ -53,44 +43,43 @@ public class HardwareHFbot {
         frontleftMotor = hwMap.dcMotor.get("fl");
         frontrightMotor = hwMap.dcMotor.get("fr");
         backleftMotor = hwMap.dcMotor.get("bl");
-        shooterLeft = hwMap.dcMotor.get("sl");
-        shooterRight = hwMap.dcMotor.get("sr");
-        evelator = hwMap.dcMotor.get("el");
-        //sensor = hwMap.legacyModule;
+        shooter = hwMap.dcMotor.get("sh");
+        sweeper = hwMap.dcMotor.get("sw");
+        // Define and Initialize Servos
+        lifter = hwMap.servo.get("li");
+        leftBeacon = hwMap.servo.get("leftB");
+        rightBeacon = hwMap.servo.get("rightB");
 
-        frontleftMotor.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
-        frontrightMotor.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
+
+        frontleftMotor.setDirection(DcMotor.Direction.FORWARD); //Sets correct motor direction based on Mecanum wheels.
+        frontrightMotor.setDirection(DcMotor.Direction.REVERSE);
         backleftMotor.setDirection(DcMotor.Direction.FORWARD);
         backrightMotor.setDirection(DcMotor.Direction.REVERSE);
-        shooterLeft.setDirection(DcMotor.Direction.REVERSE);
-        shooterRight.setDirection(DcMotor.Direction.FORWARD);
-        evelator.setDirection(DcMotor.Direction.REVERSE);
+        shooter.setDirection(DcMotor.Direction.REVERSE);
+        sweeper.setDirection(DcMotor.Direction.REVERSE);
 
         // Set all motors to zero power
         frontleftMotor.setPower(0);
         backleftMotor.setPower(0);
         frontrightMotor.setPower(0);
         backrightMotor.setPower(0);
-        shooterLeft.setPower(0);
-        shooterRight.setPower(0);
-        evelator.setPower(0);
+        shooter.setPower(0);
+        sweeper.setPower(0);
 
-        // Set all motors to run without encoders.
-        // May want to use RUN_USING_ENCODERS if encoders are installed.
+        //Sets all servo positions to 0;
+        lifter.setPosition(0);
+        leftBeacon.setPosition(0);
+        rightBeacon.setPosition(0);
+
+        //Sets driving motors to run with encoders. Used for autonomous
         frontleftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         backleftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         frontrightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         backrightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        shooterLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        shooterRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        evelator.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
-        // Define and initialize ALL installed servos.
-//        leftClaw = hwMap.servo.get("left_hand");
-//        rightClaw = hwMap.servo.get("right_hand");
-//        leftClaw.setPosition(MID_SERVO);
-//        rightClaw.setPosition(MID_SERVO);
+        //Sets sweeper and ball shooter to run without encoders because it does require exact measure.
+        sweeper.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        shooter.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     /***
@@ -117,46 +106,46 @@ public class HardwareHFbot {
         period.reset();
     }
 
-    public void drive(double fl, double fr, double bl, double br) {
-        double slowRatio = (6.75 / 10);
-        if (fl <= 1 && fr <= 1 && bl <= 1 && br <= 1 && fl >= -1 && fr >= -1 && bl >= -1 && br >= -1) { //make sure in range of motor
-            if (reversed) {
-                frontrightMotor.setPower(-fr * slowRatio);
-                frontleftMotor.setPower(-fl * slowRatio);
+    public void drive(double fl, double fr, double bl, double br) { //"main drive" Sets power of motors. Always called to move robot in TeleOP.
+
+            if (reversed) { //Reverses motor speed for reverse controls
+                frontrightMotor.setPower(-fr * FRONT_WHEEL_SLOW_RATIO);
+                frontleftMotor.setPower(-fl * FRONT_WHEEL_SLOW_RATIO);
                 backrightMotor.setPower(-br);
                 backleftMotor.setPower(-bl);
-            } else {
-                frontrightMotor.setPower(fr * slowRatio);
-                frontleftMotor.setPower(fl * slowRatio);
+            } else { //Sets motor speed based on arguments
+                frontrightMotor.setPower(fr * FRONT_WHEEL_SLOW_RATIO);
+                frontleftMotor.setPower(fl * FRONT_WHEEL_SLOW_RATIO);
                 backrightMotor.setPower(br);
                 backleftMotor.setPower(bl);
             }
-        } else {
-            drive(0, 0, 0, 0);
         }
-    }
 
-    public void drive(double flbr, double frbl) {
+    public void drive(double flbr, double frbl) { //"Secondary" Overloaded drive method that calls "main" drive method.
+                                                  // Used for simplification when applicable
 
         drive(flbr, frbl, frbl, flbr);
     }
 
-    public void drive(RobotDirectionDrive dir, double speed){
-        switch (dir){
+    public void drive(RobotDirectionDrive dir, double speed){ //Overloaded drive method that calls "Secondary" drive method.
+                                                              // Uses enums defined in RobotDirectionDrive.
+                                                              //Allows for easily coding in new movements
+
+        switch (dir){ //Sets drive to correct value based on variable dir
             case FORWARD: {
-                drive(speed,speed);
-                break;
+                drive(speed,speed); //Calls "Secondary" drive method
+                break;              //Breaks out of switch statement.
             }
             case BACK: {
                 drive(-speed,-speed);
                 break;
             }
             case LEFT: {
-                drive(-speed,speed);
+                drive(speed, -speed);
                 break;
             }
             case RIGHT: {
-                drive(speed, -speed);
+                drive(-speed, speed);
                 break;
             }
             case DFLEFT: {
@@ -176,7 +165,7 @@ public class HardwareHFbot {
                 break;
             }
             case SPINLEFT: {
-                drive(-speed,speed,-speed,speed);
+                drive(-speed,speed,-speed,speed); //Calls "main" drive due to unique nature of spinning with Mecanum wheels.
                 break;
             }
             case SPINRIGHT: {
@@ -188,23 +177,13 @@ public class HardwareHFbot {
     }
 
 
-    public void shoot(double speed) {
-        //gamemode 1
-        //give JA7ja minecraft:diamond 64
-        //op JA7ja
-        //give JA7ja minecract:diamond 64
-        //tp JA7ja ~0 ~100 ~0
-        //summon PrimedTNT ~ ~ ~ {Fuse=1}
-        shooterLeft.setPower(speed);
-        shooterRight.setPower(speed);
-        evelator.setPower(speed);
+    public void shoot(boolean running) {  //Shoots the ball from flicker.
+        if(running) {  //Checks if flicker should be running.
+            shooter.setPower(1); //Sets it running
+        }else{
+            shooter.setPower(0); //Sets it off
+        }
+
     }
-
-    public void antiShoot(double speed) {
-        evelator.setPower(speed);
-    }
-
-
-
 }
 

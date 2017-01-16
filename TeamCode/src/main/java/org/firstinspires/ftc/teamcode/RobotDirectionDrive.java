@@ -5,7 +5,7 @@ package org.firstinspires.ftc.teamcode;
  */
 
 public enum RobotDirectionDrive {
-    FORWARD, BACK, LEFT, RIGHT, DFLEFT, DFRIGHT, DBLEFT, DBRIGHT, SPINLEFT, SPINRIGHT;
+    FORWARD, BACK, LEFT, RIGHT, DFLEFT, DFRIGHT, DBLEFT, DBRIGHT, SPINLEFT, SPINRIGHT;  //Sets enum values for direction driving
     }
 
 
