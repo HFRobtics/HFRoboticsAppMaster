@@ -36,154 +36,145 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 
-
 /**
  * This file provides basic Telop driving for a Pushbot robot.
  * The code sis structured as an Iterative OpMode
- *
+ * <p>
  * This OpMode uses the common Pushbot hardware class to define the devices on the robot.
  * All device access is managed through the HardwarePushbot class.
- *
+ * <p>
  * This particular OpMode executes a basic Tank Drive Teleop for a PushBot
  * It raises and lowers the claw using the Gampad Y and A buttons respectively.
  * It also opens and closes the claws slowly using the left and right Bumper buttons.
- *
+ * <p>
  * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Mecanum", group="ROBOT")
+@TeleOp(name = "Mecanum", group = "ROBOT")
 //@Disabled
 public class BenTeleOp extends OpMode {
 
     /* Declare OpMode members.s */
-    HardwareHFbot robot       = new HardwareHFbot(); // use the class created to define a Pushbot's hardware
-    double thresh = 0.05;
-    /*
-     * Code to run ONCE when the driver hits INIT
-     */
+    HardwareHFbot robot = new HardwareHFbot(); // Use the class created to define a HFRobots hardware
+    public static boolean sweeperIsRunning = false;   //Defaults sweeper to stop
+
+
     @Override
     public void init() {
-        /* Initialize the hardware variables.
-         * The init() method of the hardware class does all the work here
-         */
-        robot.init(hardwareMap);
 
-        // Send telemetry message to signify robot waiting;
-        telemetry.addData("Say", "Hello Driver");
+        robot.init(hardwareMap); //Calls init of HardwareHFbot
+
+        // Send telemetry message to signify Init
+        telemetry.addData("Say", "Robot Initing");
+
+        //Sets all motors to stationary
+        robot.frontleftMotor.setPower(0);
+        robot.frontrightMotor.setPower(0);
+        robot.backleftMotor.setPower(0);
+        robot.backrightMotor.setPower(0);
+        robot.shooter.setPower(0);
+        robot.sweeper.setPower(0);
+
+        //Sets position of servos to start position;
+        robot.lifter.setPosition(.025);
+        robot.leftBeacon.setPosition(0);
+        robot.rightBeacon.setPosition(0);
     }
 
-    /*
-     * Code to run REPEATEDLY after the driver hits INIT, but before they hit PLAY
-     */
+
     @Override
-    public void init_loop() {
+    public void init_loop() { //Not used. Supposed to run a loop after init is pressed.
+
     }
 
-    /*
-     * Code to run ONCE when the driver hits PLAY
-     */
+
+
     @Override
-    public void start() {
+    public void start() { //Not used. Called once after driver hits ply
+
     }
 
-    /*
-     * Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
-     */
+
     @Override
-    public void loop() {
+    public void loop() { //Main loop. Called repeatably after driver hit play
+        double leftTrigger1 = gamepad1.left_trigger; //Maps trigger values
+        double rightTrigger1 = gamepad1.right_trigger;
+        double leftTrigger2 = gamepad2.left_trigger;
+        double rightTrigger2 = gamepad2.right_trigger;
+        double BaseSpeed = 0.5; //Sets base speed value of robot
 
-        double rawRstickX = gamepad.right_stick_x;
-        double rawRstickY = -gamepad.right_stick_y;
-        double rightStickX = circleToSquare(rawRStickX);
-        double rightStickY = circleToSquare(rawRStickY);
-        double linearPower = rawRstickY;
-        double rotationalPower = rightStickY - rightStickX;
-        double leftTrigger = gamepad1.left_trigger;
-        double rightTrigger = gamepad1.right_trigger;
-        int quadrant = getQuadrant(rightStickX,rightStickY);
-        double BaseSpeed = 0.5;
-
-        if(rightStickX > thresh || rightStickY > thresh || rightStickX < -thresh || rightStickY < -thresh){ //using joystick
-            switch (quadrant){
-                case 0:
-                    robot.drive(0,0,0,0);
-                case 1 :
-                    robot.drive(linearPower, rotationalPower, rotationalPower, linearPower); //Sets FR && BL to Rotational in Quadrant 1
-                    break;
-                case 2:
-                    robot.drive(rotationalPower,linearPower,linearPower,rotationalPower); //Sets FL && BR to Rotational in Quadrant 2
-                    break;
-                case 3 :
-                    robot.drive(linearPower, rotationalPower, rotationalPower, linearPower); //Sets FR && BL to Rotational in Quadrant 3
-                    break;
-                case 4:
-                    robot.drive(rotationalPower,linearPower,linearPower,rotationalPower); //Sets FL && BR to Rotational in Quadrant 4
-                    break;
-                case 5:
-                    robot.drive(rightStickX,-rightStickX,-rightStickX,rightStickX); //Sets motors FL && BR to opposite X-vaule of FR && BL
-                    break;
-            }
-        }
-        else if ( rightTrigger > thresh){
-            robot.drive(rightTrigger,-rightTrigger,rightTrigger,-rightTrigger);
-        }
-        else if ( leftTrigger > thresh){
-            robot.drive(-leftTrigger,leftTrigger,-leftTrigger,leftTrigger);
-        }
-        /*else if (rightTrigger > thresh || leftTrigger > thresh) { //code throws infinite loop
-            while ((leftTrigger > 0 || rightTrigger > 0) && !(leftTrigger > 0 && rightTrigger > 0)) { //Checks is one trigger is down but not both
-                if (leftTrigger > 0) {
-                    robot.drive(0, leftTrigger, leftTrigger, 0); //Sets FR && BL to leftTrigger vaule and will rotate robot left
-                }
-                if (rightTrigger > 0) {
-                    robot.drive(rightTrigger, 0, 0, rightTrigger); //Sets FL && BR to rightTrigger vaule and will rotate robot right
-                }
-            }
-        }*/
-        else if(gamepad1.dpad_up)
-            robot.drive(BaseSpeed,BaseSpeed,BaseSpeed,BaseSpeed);
-        else if(gamepad1.dpad_down)
-            robot.drive(-BaseSpeed,-BaseSpeed,-BaseSpeed,-BaseSpeed);
-        else if(gamepad1.dpad_left)
-            robot.drive(-BaseSpeed,BaseSpeed,BaseSpeed,-BaseSpeed);
-        else if(gamepad1.dpad_right)
-            robot.drive(BaseSpeed,-BaseSpeed,-BaseSpeed,BaseSpeed);
+        if (rightTrigger1 > .1f) {
+            robot.drive(RobotDirectionDrive.SPINRIGHT, rightTrigger1);  //Sets direction to drive based on what buttons are pressed.
+        } else if (leftTrigger1 > .1f) {
+            robot.drive(RobotDirectionDrive.SPINLEFT, leftTrigger1);
+        } else if (gamepad1.dpad_up && gamepad1.dpad_left)
+            robot.drive(RobotDirectionDrive.DFLEFT, BaseSpeed);
+        else if (gamepad1.dpad_up && gamepad1.dpad_right)
+            robot.drive(RobotDirectionDrive.DFRIGHT, BaseSpeed);
+        else if (gamepad1.dpad_down && gamepad1.dpad_left)
+            robot.drive(RobotDirectionDrive.DBLEFT, BaseSpeed);
+        else if (gamepad1.dpad_down && gamepad1.dpad_right)
+            robot.drive(RobotDirectionDrive.DBRIGHT, BaseSpeed);
+        else if (gamepad1.dpad_up)
+            robot.drive(RobotDirectionDrive.FORWARD, BaseSpeed);
+        else if (gamepad1.dpad_down)
+            robot.drive(RobotDirectionDrive.BACK, BaseSpeed);
+        else if (gamepad1.dpad_left)
+            robot.drive(RobotDirectionDrive.LEFT, BaseSpeed);
+        else if (gamepad1.dpad_right)
+            robot.drive(RobotDirectionDrive.RIGHT, BaseSpeed);
         else
-            robot.drive(0,0,0,0);
+            robot.drive(0, 0, 0, 0);
 
-        telemetry.addData("Joy Y", rightStickY);
-        telemetry.addData("Joy X", rightStickX);
-        telemetry.addData("FLBR", linearPower);
-        telemetry.addData("FRBL", rotationalPower);
-        telemetry.addData("Quadrant", quadrant);
-    }
-
-    /*
-     * Code to run ONCE after the driver hits STOP
-     */
-    @Override
-    public void stop() {
-        robot.drive(0,0,0,0);
-    }
-
-    public int getQuadrant(double xJoyPos, double yJoyPos){ //Returns Quadrant of joystick
-        if (yJoyPos == 0 && xJoyPos == 0) return 0;
-        if (yJoyPos > 0 && xJoyPos > 0) return 1;
-        if (yJoyPos < 0 && xJoyPos > 0) return 2;
-        if (yJoyPos < 0 && xJoyPos < 0) return 3;
-        if (yJoyPos > 0 && xJoyPos < 0) return 4;
-        if (yJoyPos == 0 && (xJoyPos == 1 || xJoyPos == -1)) return 5;
-        return 1;
-    }
-
-    public double circleToSquare(double joyInput)
-    {
-        if(joyInput < 0)
-        {
-            return -(Math.pow(joyInput, 2))
-        }else{
-            return Math.pow(joyInput, 2)
+        if (gamepad1.y) {
+            robot.reversed = !robot.reversed;  //Reverses robot driving
         }
+
+        if(gamepad2.right_bumper){  //Raises lifter based on value of right trigger
+            robot.lifter.setPosition(.477);
+        }
+        if(gamepad2.left_bumper){
+            robot.lifter.setPosition(.025);
+        }
+        if (gamepad2.x) { //Button for shooter
+            robot.shoot(true); //Calls shoot method in HardwareHFbot. Basically turns shooter while 'x' is held down.
+        } else {
+            robot.shoot(false); //Sets shooter to stop turning.
+        }
+
+        if(gamepad2.a){ //Checks if  a is pressed
+            robot.sweeper.setPower(.75); //Sets sweeper running
+        }
+        if(gamepad2.b){
+            robot.sweeper.setPower(0);
+        }
+        if(gamepad2.dpad_right){ //Checks if dpad right is pressed
+            robot.leftBeacon.setPosition(0); //Sets left beacon presser to up
+            robot.rightBeacon.setPosition(.58);//Sets right beacon presser to down
+        }
+        if(gamepad2.dpad_left){ //Checks if dpad left is pressed
+            robot.rightBeacon.setPosition(0);//Sets right beacon presser to up
+            robot.leftBeacon.setPosition(.5); //Sets left beacon presser down
+        }
+        if(gamepad2.dpad_down){ //Checks if dpad down is pressed
+            robot.leftBeacon.setPosition(0); //Sets both beacon pressers to up position
+            robot.rightBeacon.setPosition(0);
+        }
+
+        telemetry.addData("Is Reversed: ", robot.reversed); //Add telemetry to see if robot control are reversed
+        telemetry.addData("Fork servo value", robot.lifter.getPosition()); //Adds lifter servo value
     }
+
+
+    @Override
+    public void stop() { //Called when driver hits stop
+        robot.drive(0, 0, 0, 0); //Sets all motors to zero.
+        robot.shooter.setPower(0);
+        robot.sweeper.setPower(0);
+        robot.lifter.setPosition(0);
+
+    }
+
+
 }
